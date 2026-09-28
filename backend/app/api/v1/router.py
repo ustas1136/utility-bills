@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
     auth,
+    bff,
     catalog,
     charges,
     health,
@@ -24,3 +25,4 @@ api_router.include_router(charges.router)
 api_router.include_router(reminders.router)
 api_router.include_router(notifications.router)
 api_router.include_router(reports.router)
+api_router.include_router(bff.router)

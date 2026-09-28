@@ -224,7 +224,7 @@ class ReportRepository:
               ), 0) AS paid_amount,
               c.currency AS currency,
               c.due_date AS due_date,
-              (c.due_date - CURRENT_DATE) AS days_left,
+              (c.due_date - :today) AS days_left,
               c.status AS status
             FROM charges c
             JOIN property_services ps
@@ -235,12 +235,21 @@ class ReportRepository:
               ON ps.service_type_id = st.id
             WHERE prop.household_id = ANY(:hh)
               AND c.status IN ('pending', 'partial', 'overdue')
-              AND c.due_date <= (CURRENT_DATE + (:days || ' days')::interval)
+              AND c.due_date <= (:today + (:days || ' days')::interval)
             ORDER BY c.due_date
             LIMIT 100
             """
         )
+        from datetime import date as _date
+
         rows = (
-            await self.db.execute(sql, {"hh": household_ids, "days": days})
+            await self.db.execute(
+                sql,
+                {
+                    "hh": household_ids,
+                    "days": days,
+                    "today": _date.today(),
+                },
+            )
         ).mappings().all()
         return [dict(r) for r in rows]
