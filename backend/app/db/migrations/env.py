@@ -10,8 +10,8 @@ from app.core.config import get_settings
 from app.db.base import Base
 
 # ВАЖНО: импорт всех моделей, чтобы Alembic видел их в metadata.
-# На этапе 1 моделей нет. Раскомментировать на этапе 2:
-# import app.models  # noqa: F401
+# На этапе 2 раскомментировать:
+# import app.models
 
 config = context.config
 settings = get_settings()
