@@ -7,7 +7,9 @@ from app.api.v1.endpoints import (
     health,
     households,
     meters,
+    notifications,
     properties,
+    reminders,
 )
 
 api_router = APIRouter(prefix="/api/v1")
@@ -18,3 +20,5 @@ api_router.include_router(catalog.router)
 api_router.include_router(properties.router)
 api_router.include_router(meters.router)
 api_router.include_router(charges.router)
+api_router.include_router(reminders.router)
+api_router.include_router(notifications.router)

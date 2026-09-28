@@ -17,7 +17,7 @@ class ReminderRuleBase(BaseModel):
 
 
 class ReminderRuleCreate(ReminderRuleBase):
-    household_id: int
+    pass
 
 
 class ReminderRuleUpdate(BaseModel):
