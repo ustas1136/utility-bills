@@ -10,6 +10,7 @@ from app.api.v1.endpoints import (
     notifications,
     properties,
     reminders,
+    reports,
 )
 
 api_router = APIRouter(prefix="/api/v1")
@@ -22,3 +23,4 @@ api_router.include_router(meters.router)
 api_router.include_router(charges.router)
 api_router.include_router(reminders.router)
 api_router.include_router(notifications.router)
+api_router.include_router(reports.router)
