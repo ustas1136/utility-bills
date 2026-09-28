@@ -14,6 +14,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, TimestampMixin
 
 if TYPE_CHECKING:
+    from app.models.meter import Meter
     from app.models.service_type import ServiceType
 
 
@@ -30,7 +31,7 @@ class Property(Base, TimestampMixin):
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     address: Mapped[str | None] = mapped_column(String(500))
     # Специфичные для типа атрибуты: VIN, кадастр, площадь и т.п.
-    # column name = "metadata" — читаемее в БД, атрибут `metadata_json`,
+    # В БД колонка называется "metadata", атрибут metadata_json —
     # чтобы не конфликтовать с Base.metadata
     metadata_json: Mapped[dict] = mapped_column(
         "metadata",
@@ -56,7 +57,9 @@ class Property(Base, TimestampMixin):
 class PropertyService(Base, TimestampMixin):
     __tablename__ = "property_services"
     __table_args__ = (
-        UniqueConstraint("property_id", "service_type_id", name="uq_prop_service"),
+        UniqueConstraint(
+            "property_id", "service_type_id", name="uq_prop_service"
+        ),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -80,3 +83,8 @@ class PropertyService(Base, TimestampMixin):
 
     property: Mapped["Property"] = relationship(back_populates="services")
     service_type: Mapped["ServiceType"] = relationship(lazy="joined")
+    meters: Mapped[list["Meter"]] = relationship(
+        back_populates="property_service",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
