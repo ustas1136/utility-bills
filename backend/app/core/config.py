@@ -26,6 +26,18 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 30
 
+    # Scheduler
+    scheduler_enabled: bool = True
+    scheduler_interval_minutes: int = 60
+
+    # SMTP (dev: оставить пустым — письма пишутся в лог)
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_user: str | None = None
+    smtp_password: str | None = None
+    smtp_from: str = "noreply@utility-bills.local"
+    smtp_use_tls: bool = True
+
     # CORS
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
 

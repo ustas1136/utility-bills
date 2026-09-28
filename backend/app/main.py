@@ -13,7 +13,18 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_logging()
+
+    scheduler = None
+    if settings.scheduler_enabled:
+        from app.workers.scheduler import create_scheduler
+
+        scheduler = create_scheduler()
+        scheduler.start()
+
     yield
+
+    if scheduler is not None:
+        scheduler.shutdown(wait=False)
 
 
 app = FastAPI(

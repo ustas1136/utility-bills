@@ -91,25 +91,27 @@ class NotificationRepository:
         )
         return list((await self.db.execute(stmt)).scalars().all())
 
-    async def exists_dedup(
+    async def exists_for(
         self,
         user_id: int,
         charge_id: int | None,
         reminder_rule_id: int | None,
         channel: str,
-        scheduled_date,
     ) -> bool:
+        """Проверяет, было ли уже уведомление для (user, charge, rule, channel)."""
         stmt = select(Notification.id).where(
             Notification.user_id == user_id,
-            Notification.charge_id.is_(charge_id)
-            if charge_id is None
-            else Notification.charge_id == charge_id,
-            Notification.reminder_rule_id.is_(reminder_rule_id)
-            if reminder_rule_id is None
-            else Notification.reminder_rule_id == reminder_rule_id,
             Notification.channel == channel,
-            Notification.scheduled_date == scheduled_date,
+            Notification.status != "cancelled",
         )
+        if charge_id is None:
+            stmt = stmt.where(Notification.charge_id.is_(None))
+        else:
+            stmt = stmt.where(Notification.charge_id == charge_id)
+        if reminder_rule_id is None:
+            stmt = stmt.where(Notification.reminder_rule_id.is_(None))
+        else:
+            stmt = stmt.where(Notification.reminder_rule_id == reminder_rule_id)
         return (await self.db.execute(stmt)).first() is not None
 
     async def create(

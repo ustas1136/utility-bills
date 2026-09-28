@@ -84,3 +84,34 @@ class ChargeRepository:
             Payment.charge_id == charge_id
         )
         return (await self.db.execute(stmt)).scalar_one()
+
+    async def list_unpaid_in_household(
+        self, household_id: int, due_before: date
+    ) -> list[Charge]:
+        from sqlalchemy.orm import joinedload
+
+        from app.models.property import Property, PropertyService
+
+        stmt = (
+            select(Charge)
+            .join(
+                PropertyService,
+                Charge.property_service_id == PropertyService.id,
+            )
+            .join(
+                Property,
+                PropertyService.property_id == Property.id,
+            )
+            .where(
+                Property.household_id == household_id,
+                Charge.status.in_(("pending", "partial", "overdue")),
+                Charge.due_date <= due_before,
+            )
+            .options(
+                joinedload(Charge.property_service).joinedload(
+                    PropertyService.service_type
+                )
+            )
+            .order_by(Charge.due_date)
+        )
+        return list((await self.db.execute(stmt)).scalars().all())

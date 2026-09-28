@@ -67,6 +67,13 @@ class ReminderRuleRepository:
         await self.db.delete(rule)
         await self.db.flush()
 
+    async def list_all_active(self) -> list[ReminderRule]:
+        stmt = (
+            select(ReminderRule)
+            .where(ReminderRule.is_active.is_(True))
+            .order_by(ReminderRule.household_id)
+        )
+        return list((await self.db.execute(stmt)).scalars().all())
 
 class NotificationPreferenceRepository:
     def __init__(self, db: AsyncSession):

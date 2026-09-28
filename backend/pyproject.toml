@@ -16,6 +16,8 @@ dependencies = [
     "pwdlib[argon2]>=0.2.1",
     "pyjwt>=2.10",
     "python-multipart>=0.0.12",
+    "apscheduler>=3.10",
+    "aiosmtplib>=3.0",
 ]
 
 [project.optional-dependencies]
