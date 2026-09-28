@@ -3,21 +3,27 @@
 from app.models.charge import Charge, Payment
 from app.models.household import Household, HouseholdMember, Invitation
 from app.models.meter import Meter, Reading
+from app.models.notification import Device, Notification
 from app.models.property import Property, PropertyService
+from app.models.reminder import NotificationPreference, ReminderRule
 from app.models.service_type import ServiceType
 from app.models.tariff import Tariff
 from app.models.user import User
 
 __all__ = [
     "Charge",
+    "Device",
     "Household",
     "HouseholdMember",
     "Invitation",
     "Meter",
+    "Notification",
+    "NotificationPreference",
     "Payment",
     "Property",
     "PropertyService",
     "Reading",
+    "ReminderRule",
     "ServiceType",
     "Tariff",
     "User",
