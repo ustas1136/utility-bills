@@ -14,6 +14,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, TimestampMixin
 
 if TYPE_CHECKING:
+    from app.models.charge import Charge
     from app.models.meter import Meter
     from app.models.service_type import ServiceType
 
@@ -84,6 +85,11 @@ class PropertyService(Base, TimestampMixin):
     property: Mapped["Property"] = relationship(back_populates="services")
     service_type: Mapped["ServiceType"] = relationship(lazy="joined")
     meters: Mapped[list["Meter"]] = relationship(
+        back_populates="property_service",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+    charges: Mapped[list["Charge"]] = relationship(
         back_populates="property_service",
         cascade="all, delete-orphan",
         lazy="selectin",

@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.api.v1.endpoints import (
     auth,
     catalog,
+    charges,
     health,
     households,
     meters,
@@ -16,3 +17,4 @@ api_router.include_router(households.router)
 api_router.include_router(catalog.router)
 api_router.include_router(properties.router)
 api_router.include_router(meters.router)
+api_router.include_router(charges.router)
