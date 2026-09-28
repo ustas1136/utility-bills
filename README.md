@@ -1,0 +1,102 @@
+cat > README.md << 'EOF'
+# Utility Bills
+
+Приложение для учёта коммунальных платежей, налогов и страховок.
+
+## Стек
+
+- **Backend:** FastAPI, SQLAlchemy 2.0 (async), PostgreSQL, Alembic
+- **Auth:** JWT (access + refresh)
+- **Инфраструктура:** Docker, Docker Compose, GitHub Actions
+- **Тесты:** pytest, httpx
+
+## Быстрый старт
+
+```bash
+cp backend/.env.example backend/.env
+docker compose up --build
+
+- API: http://localhost:18090
+- Swagger: http://localhost:18090/docs
+- Health: http://localhost:18090/health
+
+Дорожная карта
+☑ Этап 1. Фундамент и инфраструктура
+□ Этап 2. Аутентификация
+□ Этап 3. Households и роли
+□ Этап 4. Справочники
+□ Этап 5. Объекты
+□ Этап 6. Счётчики и показания
+□ Этап 7. Начисления и платежи
+□ Этап 8. Напоминания
+□ Этап 9. Отчёты
+□ Этап 10. Задел под будущее
+□ Этап 11. Мобильное приложение
+EOF
+
+
+---
+
+## Шаг 4. Backend: конфигурация
+
+### 4.1. `backend/pyproject.toml`
+
+```bash
+cat > backend/pyproject.toml << 'EOF'
+[project]
+name = "utility-bills-backend"
+version = "0.1.0"
+description = "Backend for utility bills tracking"
+requires-python = ">=3.12"
+
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "sqlalchemy[asyncio]>=2.0.36",
+    "alembic>=1.14",
+    "psycopg[binary]>=3.2",
+    "pydantic>=2.10",
+    "pydantic-settings>=2.6",
+    "email-validator>=2.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.27",
+    "ruff>=0.7",
+    "mypy>=1.13",
+]
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["app/db/migrations/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"app/db/migrations/*" = ["E501"]
+"tests/*" = ["S101"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-ra -q"
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = true
+warn_unused_ignores = true
+EOF
