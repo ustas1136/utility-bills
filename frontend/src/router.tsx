@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PublicOnlyRoute } from "@/components/PublicOnlyRoute";
+import { ChargeDetailPage } from "@/pages/ChargeDetailPage";
 import { ChargesPage } from "@/pages/ChargesPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { LoginPage } from "@/pages/LoginPage";
@@ -32,6 +33,7 @@ export const router = createBrowserRouter([
           { path: "properties", element: <PropertiesPage /> },
           { path: "properties/:id", element: <PropertyDetailPage /> },
           { path: "charges", element: <ChargesPage /> },
+          { path: "charges/:id", element: <ChargeDetailPage /> },
           { path: "reports", element: <ReportsPage /> },
           { path: "settings", element: <SettingsPage /> },
           { path: "*", element: <NotFoundPage /> },
