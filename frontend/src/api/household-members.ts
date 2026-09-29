@@ -7,12 +7,14 @@ export interface HouseholdMember {
   user_id: number;
   role: HouseholdRole;
   joined_at: string;
+  email: string | null; 
 }
 
 export interface Invitation {
   id: number;
   email: string;
   role: HouseholdRole;
+  token: string;
   expires_at: string;
   accepted_at: string | null;
   created_at: string;

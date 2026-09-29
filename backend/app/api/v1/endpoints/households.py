@@ -68,6 +68,18 @@ async def list_members(
     members = await HouseholdService(db).list_members(
         household_id, current_user.id
     )
+    from app.repositories.user_repo import UserRepository
+
+    user_repo = UserRepository(db)
+    result = []
+    for m in members:
+        user = await user_repo.get_by_id(m.user_id)
+        result.append(
+            MemberRead.model_validate(m).model_copy(
+                update={"email": user.email if user else None}
+            )
+        )
+    return result
     return [MemberRead.model_validate(m) for m in members]
 
 

@@ -34,6 +34,7 @@ class MemberRead(BaseModel):
     user_id: int
     role: str
     joined_at: datetime
+    email: str | None = None
 
 
 class MemberUpdate(BaseModel):

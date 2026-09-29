@@ -14,6 +14,7 @@ class InvitationRead(BaseModel):
     id: int
     email: str
     role: str
+    token: str
     expires_at: datetime
     accepted_at: datetime | None
     created_at: datetime
