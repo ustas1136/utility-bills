@@ -20,4 +20,60 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    chunkSizeWarningLimit: 700,
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (!id.includes("node_modules")) return;
+
+          // React core
+          if (
+            /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler)[\\/]/.test(
+              id,
+            )
+          ) {
+            return "vendor-react";
+          }
+
+          // Charts (recharts + d3 зависимости)
+          if (
+            /[\\/]node_modules[\\/](recharts|d3-|victory-|internmap)/.test(id)
+          ) {
+            return "vendor-charts";
+          }
+
+          // Data fetching
+          if (
+            /[\\/]node_modules[\\/](@tanstack|zustand)[\\/]/.test(id)
+          ) {
+            return "vendor-query";
+          }
+
+          // Forms
+          if (
+            /[\\/]node_modules[\\/](react-hook-form|zod|@hookform)[\\/]/.test(
+              id,
+            )
+          ) {
+            return "vendor-forms";
+          }
+
+          // UI-утилиты
+          if (
+            /[\\/]node_modules[\\/](lucide-react|clsx|tailwind-merge|class-variance-authority|date-fns|sonner|cmdk)[\\/]/.test(
+              id,
+            )
+          ) {
+            return "vendor-ui";
+          }
+
+          // Radix UI
+          if (/[\\/]node_modules[\\/]@radix-ui[\\/]/.test(id)) {
+            return "vendor-radix";
+          }
+        },
+      },
+    },
+  },
 });
