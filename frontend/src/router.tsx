@@ -13,7 +13,6 @@ import { ReportsPage } from "@/pages/ReportsPage";
 import { SettingsPage } from "@/pages/SettingsPage";
 
 export const router = createBrowserRouter([
-  // Публичные маршруты (только для неавторизованных)
   {
     element: <PublicOnlyRoute />,
     children: [
@@ -21,8 +20,6 @@ export const router = createBrowserRouter([
       { path: "/register", element: <RegisterPage /> },
     ],
   },
-
-  // Защищённые маршруты
   {
     element: <ProtectedRoute />,
     children: [
