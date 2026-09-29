@@ -69,3 +69,11 @@ async def create_tariff(
 ):
     t = await CatalogService(db).create_tariff(current_user.id, data)
     return TariffRead.model_validate(t)
+
+@router.delete(
+    "/tariffs/{tariff_id}", status_code=status.HTTP_204_NO_CONTENT
+)
+async def delete_tariff(
+    tariff_id: int, db: DbSession, current_user: CurrentUser
+):
+    await CatalogService(db).delete_tariff(tariff_id, current_user.id)

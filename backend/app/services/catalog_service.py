@@ -122,3 +122,20 @@ class CatalogService:
         await self.db.commit()
         await self.db.refresh(tariff)
         return tariff
+    
+    async def delete_tariff(self, tariff_id: int, user_id: int) -> None:
+        tariff = await self.tariffs.get_by_id(tariff_id)
+        if not tariff:
+            raise HTTPException(status_code=404, detail="Tariff not found")
+        # Проверяем права: если привязан к household — только admin+
+        if tariff.household_id is not None:
+            membership = await self.households.get_membership(
+                tariff.household_id, user_id
+            )
+            if not membership or not can_manage(membership.role):
+                raise HTTPException(
+                    status_code=403,
+                    detail="Cannot delete tariff of this household",
+                )
+        await self.db.delete(tariff)
+        await self.db.commit()

@@ -52,6 +52,9 @@ const SettingsPage = lazy(() =>
 const NotFoundPage = lazy(() =>
   import("@/pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),
 );
+const TariffsPage = lazy(() =>
+  import("@/pages/TariffsPage").then((m) => ({ default: m.TariffsPage })),
+);
 
 // Обёртка: кладёт страницу в Suspense с общим лоадером
 function page(element: ReactNode) {
@@ -88,6 +91,13 @@ export const router = createBrowserRouter([
           { path: "reports", element: page(<ReportsPage />) },
           { path: "settings", element: page(<SettingsPage />) },
           { path: "*", element: page(<NotFoundPage />) },
+                    { path: "charges", element: page(<ChargesPage />) },
+          {
+            path: "charges/:id",
+            element: page(<ChargeDetailPage />),
+          },
+          { path: "tariffs", element: page(<TariffsPage />) },   // ← новое
+          { path: "reports", element: page(<ReportsPage />) },
         ],
       },
     ],

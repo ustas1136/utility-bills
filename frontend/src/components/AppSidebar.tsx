@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Receipt,
   Settings,
+  TrendingUp,
   Wallet,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
@@ -14,6 +15,7 @@ const NAV = [
   { to: "/", label: "Дашборд", icon: LayoutDashboard, end: true },
   { to: "/properties", label: "Объекты", icon: Building2 },
   { to: "/charges", label: "Платежи", icon: Receipt },
+  { to: "/tariffs", label: "Тарифы", icon: TrendingUp },
   { to: "/reports", label: "Отчёты", icon: BarChart3 },
   { to: "/settings", label: "Настройки", icon: Settings },
 ];
