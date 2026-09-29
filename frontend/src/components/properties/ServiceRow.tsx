@@ -3,8 +3,9 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { Droplet, Plus, Zap } from "lucide-react";
+import { ChevronRight, Droplet, Plus, Zap } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 import { metersApi } from "@/api/meters";
@@ -44,6 +45,7 @@ export function ServiceRow({ service }: Props) {
   });
 
   const st = serviceType.data;
+  const hasActiveMeter = (meters.data ?? []).some((m) => !m.replaced_at);
 
   return (
     <div className="rounded-xl border bg-card p-4">
@@ -72,13 +74,22 @@ export function ServiceRow({ service }: Props) {
               ) : meters.data && meters.data.length > 0 ? (
                 <ul className="space-y-1">
                   {meters.data.map((m) => (
-                    <li
-                      key={m.id}
-                      className="text-xs text-muted-foreground flex items-center gap-2"
-                    >
-                      <span className="size-1.5 rounded-full bg-emerald-500" />
-                      {m.serial_number ?? "без номера"} · {m.unit} · начальное{" "}
-                      {Number(m.initial_value).toFixed(2)}
+                    <li key={m.id}>
+                      <Link
+                        to={`/meters/${m.id}`}
+                        className="text-xs flex items-center gap-2 hover:text-foreground transition-colors"
+                      >
+                        <span
+                          className={`size-1.5 rounded-full shrink-0 ${
+                            m.replaced_at ? "bg-amber-500" : "bg-emerald-500"
+                          }`}
+                        />
+                        <span className="text-muted-foreground truncate">
+                          {m.serial_number ?? "без номера"} · {m.unit} ·
+                          начальное {Number(m.initial_value).toFixed(2)}
+                        </span>
+                        <ChevronRight className="size-3 ml-auto text-muted-foreground shrink-0" />
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -88,15 +99,17 @@ export function ServiceRow({ service }: Props) {
                 </div>
               )}
 
-              <Button
-                variant="ghost"
-                size="sm"
-                className="mt-1 h-7 px-2 text-xs"
-                onClick={() => setMeterDialogOpen(true)}
-              >
-                <Plus className="size-3 mr-1" />
-                Добавить счётчик
-              </Button>
+              {!hasActiveMeter && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-1 h-7 px-2 text-xs"
+                  onClick={() => setMeterDialogOpen(true)}
+                >
+                  <Plus className="size-3 mr-1" />
+                  Добавить счётчик
+                </Button>
+              )}
             </div>
           )}
         </div>
