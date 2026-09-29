@@ -65,11 +65,11 @@ async def delete_household(
 async def list_members(
     household_id: int, db: DbSession, current_user: CurrentUser
 ):
+    from app.repositories.user_repo import UserRepository
+
     members = await HouseholdService(db).list_members(
         household_id, current_user.id
     )
-    from app.repositories.user_repo import UserRepository
-
     user_repo = UserRepository(db)
     result = []
     for m in members:
@@ -80,7 +80,6 @@ async def list_members(
             )
         )
     return result
-    return [MemberRead.model_validate(m) for m in members]
 
 
 @router.patch("/{household_id}/members/{member_user_id}", response_model=MemberRead)

@@ -134,6 +134,7 @@ export function HouseholdsTab() {
                   member={m}
                   householdId={currentHouseholdId!}
                   currentUserRole={currentUserRole}
+                  memberEmail={m.email ?? undefined}
                 />
               ))}
             </div>
