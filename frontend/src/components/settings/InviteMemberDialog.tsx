@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { HttpError } from "@/api/client";
 import {
   invitationsApi,
-  type HouseholdRole,
   type InvitationCreate,
 } from "@/api/household-members";
 import { Button } from "@/components/ui/button";

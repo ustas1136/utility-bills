@@ -13,7 +13,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/store/auth";
 
-export function AppHeader() {
+interface AppHeaderProps {
+  onOpenPalette?: () => void;
+}
+
+export function AppHeader({ onOpenPalette }: AppHeaderProps) {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const initials = user?.email?.slice(0, 2).toUpperCase() ?? "?";
@@ -25,7 +29,10 @@ export function AppHeader() {
         <span className="font-semibold text-sm">Utility Bills</span>
       </div>
 
-      <button className="hidden md:flex items-center gap-2 px-3 h-9 min-w-72 rounded-md border bg-background text-sm text-muted-foreground hover:bg-muted transition-colors">
+      <button
+        onClick={onOpenPalette}
+        className="hidden md:flex items-center gap-2 px-3 h-9 min-w-72 rounded-md border bg-background text-sm text-muted-foreground hover:bg-muted transition-colors text-left"
+      >
         <Search className="size-4" />
         Поиск
         <kbd className="ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded border">
@@ -35,7 +42,7 @@ export function AppHeader() {
 
       <div className="ml-auto flex items-center gap-1">
         <Button variant="ghost" size="icon" asChild>
-          <Link to="/settings">
+          <Link to="/settings?tab=notifications">
             <Bell className="size-5" />
           </Link>
         </Button>

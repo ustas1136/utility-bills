@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Clock, Home, Mail, Users, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -25,7 +25,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatRelative } from "@/lib/format";
 
 export function HouseholdsTab() {
-  const queryClient = useQueryClient();
 
   const households = useQuery({
     queryKey: ["households"],
