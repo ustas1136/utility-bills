@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 
 import { householdsApi } from "@/api/households";
 import { serviceTypesApi } from "@/api/service-types";
-import { tariffsApi } from "@/api/tariffs";
+import { tariffsApi, type Tariff } from "@/api/tariffs";
 import { EmptyState } from "@/components/EmptyState";
 import { CreateTariffDialog } from "@/components/tariffs/CreateTariffDialog";
 import { TariffCard } from "@/components/tariffs/TariffCard";
@@ -53,17 +53,14 @@ export function TariffsPage() {
 
   // Группировка по услугам (для читаемости списка)
   const grouped = useMemo(() => {
-    const map = new Map<
-      number,
-      { serviceName: string; items: typeof tariffs.data }
-    >();
+    const map = new Map<number, { serviceName: string; items: Tariff[] }>();
     for (const t of tariffs.data ?? []) {
       const st = serviceTypesMap.get(t.service_type_id);
       const key = t.service_type_id;
       if (!map.has(key)) {
         map.set(key, { serviceName: st?.name ?? `Услуга #${key}`, items: [] });
       }
-      map.get(key)!.items!.push(t);
+      map.get(key)!.items.push(t);
     }
     return Array.from(map.values()).sort((a, b) =>
       a.serviceName.localeCompare(b.serviceName),
@@ -111,7 +108,7 @@ export function TariffsPage() {
                 {group.serviceName}
               </h2>
               <div className={cn("grid grid-cols-1 lg:grid-cols-2 gap-3")}>
-                {group.items!.map((t) => (
+                {group.items.map((t) => (
                   <TariffCard
                     key={t.id}
                     tariff={t}
