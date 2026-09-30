@@ -15,6 +15,20 @@ export function formatDate(date: string | Date): string {
   return format(d, "d MMM yyyy", { locale: ru });
 }
 
+/** Показания счётчиков: до трёх знаков после запятой. */
+export function formatQuantity(value: number): string {
+  return new Intl.NumberFormat("ru-RU", {
+    maximumFractionDigits: 3,
+  }).format(value);
+}
+
+export function formatPercent(value: number): string {
+  return new Intl.NumberFormat("ru-RU", {
+    style: "percent",
+    maximumFractionDigits: 1,
+  }).format(value);
+}
+
 export function formatRelative(date: string): string {
   return formatDistanceToNow(parseISO(date), {
     addSuffix: true,
