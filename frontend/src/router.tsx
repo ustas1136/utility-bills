@@ -88,16 +88,10 @@ export const router = createBrowserRouter([
             path: "charges/:id",
             element: page(<ChargeDetailPage />),
           },
+          { path: "tariffs", element: page(<TariffsPage />) },
           { path: "reports", element: page(<ReportsPage />) },
           { path: "settings", element: page(<SettingsPage />) },
           { path: "*", element: page(<NotFoundPage />) },
-                    { path: "charges", element: page(<ChargesPage />) },
-          {
-            path: "charges/:id",
-            element: page(<ChargeDetailPage />),
-          },
-          { path: "tariffs", element: page(<TariffsPage />) },   // ← новое
-          { path: "reports", element: page(<ReportsPage />) },
         ],
       },
     ],
