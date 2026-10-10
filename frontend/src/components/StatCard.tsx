@@ -10,11 +10,13 @@ interface StatCardProps {
   tone?: "default" | "warning" | "destructive" | "success";
 }
 
+// §2: карточка нейтральная, цвет — только у иконки и только по смыслу.
+// Значения — на токенах, поэтому иконки следуют теме (включая comfort).
 const TONES = {
-  default: "bg-primary/10 text-primary",
-  warning: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-  destructive: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
-  success: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  default: "bg-muted text-muted-foreground",
+  warning: "bg-[var(--warning-bg)] text-[var(--warning)]",
+  destructive: "bg-[var(--critical-bg)] text-[var(--critical)]",
+  success: "bg-[var(--success-bg)] text-[var(--success)]",
 };
 
 export function StatCard({
@@ -31,7 +33,7 @@ export function StatCard({
           <div className="text-xs uppercase tracking-wide text-muted-foreground">
             {label}
           </div>
-          <div className="mt-2 text-2xl font-semibold truncate">{value}</div>
+          <div className="mt-2 text-[1.75rem] leading-9 sm:text-[2rem] sm:leading-10 font-semibold tabular-nums truncate">{value}</div>
           {sublabel && (
             <div className="mt-1 text-xs text-muted-foreground">{sublabel}</div>
           )}

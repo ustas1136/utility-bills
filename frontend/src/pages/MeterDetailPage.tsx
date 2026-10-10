@@ -171,7 +171,7 @@ export function MeterDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-semibold tabular-nums">
+            <div className="text-[1.75rem] leading-9 sm:text-[2rem] sm:leading-10 font-semibold tabular-nums">
               {lastValue.toFixed(3)} {m.unit}
             </div>
             {lastReading && (
@@ -189,7 +189,7 @@ export function MeterDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-semibold tabular-nums">
+            <div className="text-[1.75rem] leading-9 sm:text-[2rem] sm:leading-10 font-semibold tabular-nums">
               {Number(m.initial_value).toFixed(3)} {m.unit}
             </div>
           </CardContent>
@@ -202,7 +202,7 @@ export function MeterDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-semibold tabular-nums">
+            <div className="text-[1.75rem] leading-9 sm:text-[2rem] sm:leading-10 font-semibold tabular-nums">
               {sortedReadings.length}
             </div>
           </CardContent>

@@ -34,7 +34,7 @@ export function TariffCard({ tariff, serviceName, householdName }: Props) {
           <div className="font-medium text-sm">{serviceName}</div>
 
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold tabular-nums">
+            <span className="text-[1.75rem] leading-9 sm:text-[2rem] sm:leading-10 font-semibold tabular-nums">
               {Number(tariff.rate).toFixed(4)}
             </span>
             <span className="text-sm text-muted-foreground">

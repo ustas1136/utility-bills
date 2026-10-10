@@ -136,7 +136,7 @@ export function ChargeDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-semibold tabular-nums">
+            <div className="text-[1.75rem] leading-9 sm:text-[2rem] sm:leading-10 font-semibold tabular-nums">
               {formatMoney(c.amount, c.currency)}
             </div>
           </CardContent>
@@ -149,7 +149,7 @@ export function ChargeDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-semibold tabular-nums">
+            <div className="text-[1.75rem] leading-9 sm:text-[2rem] sm:leading-10 font-semibold tabular-nums">
               {formatMoney(c.paid_amount, c.currency)}
             </div>
           </CardContent>
@@ -162,7 +162,7 @@ export function ChargeDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-semibold tabular-nums">
+            <div className="text-[1.75rem] leading-9 sm:text-[2rem] sm:leading-10 font-semibold tabular-nums">
               {formatMoney(remaining, c.currency)}
             </div>
           </CardContent>
