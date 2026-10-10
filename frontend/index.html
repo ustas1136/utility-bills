@@ -4,6 +4,32 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Тема ставится до первой отрисовки, иначе на тёмной/тёплой теме
+      видна вспышка светлой. Логика повторяет resolveTheme() из
+      src/hooks/use-theme.ts и читает тот же ключ персиста.
+    -->
+    <script>
+      (function () {
+        try {
+          var raw = localStorage.getItem("utility-bills-theme");
+          var stored = raw ? JSON.parse(raw) : null;
+          var theme =
+            stored && stored.state && stored.state.theme
+              ? stored.state.theme
+              : "system";
+          var effective = theme;
+          if (theme === "system") {
+            effective = window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+          }
+          document.documentElement.setAttribute("data-theme", effective);
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "light");
+        }
+      })();
+    </script>
     <title>frontend</title>
   </head>
   <body>
