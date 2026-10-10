@@ -94,11 +94,11 @@ const KPI = `(()=>{
   }));
 })()`;
 
-/** Иконки StatCard: контейнер с rounded-lg/p-2.5 + подпись карточки. */
+/** Иконки StatCard: контейнер с rounded-lg/p-2(±.5) + подпись карточки. */
 const TONES_PROBE = `(()=>{
   const icons = [...document.querySelectorAll('div')].filter(e =>
-    typeof e.className === 'string' &&
-    e.className.includes('rounded-lg') && e.className.includes('p-2.5'));
+    typeof e.className === 'string' && e.className.includes('rounded-lg') &&
+    /(^|\\s)p-2(\\.5)?(\\s|$)/.test(e.className));
   return JSON.stringify(icons.map(e => {
     const card = e.closest('div.rounded-xl');
     const cs = getComputedStyle(e);
@@ -283,7 +283,15 @@ async function main() {
         `${url}: числа не обрезаны`,
         kpis.every((k) => !k.truncated),
         JSON.stringify(
-          kpis.filter((k) => k.truncated).map((k) => `${k.text} ${k.scrollW}>${k.clientW}`),
+          kpis
+            .filter((k) => k.truncated)
+            .map(
+              (k) =>
+                `${k.text}: +${k.scrollW - k.clientW}px (+${(
+                  ((k.scrollW - k.clientW) / k.clientW) *
+                  100
+                ).toFixed(1)}%) [${k.scrollW}>${k.clientW}]`,
+            ),
         ),
       );
     }
@@ -314,6 +322,21 @@ async function main() {
         `${url}: line-height 36px`,
         kpis.every((k) => k.lineHeight === "36px"),
         JSON.stringify([...new Set(kpis.map((k) => k.lineHeight))]),
+      );
+      check(
+        `${url}: числа не обрезаны на узком окне`,
+        kpis.every((k) => !k.truncated),
+        JSON.stringify(
+          kpis
+            .filter((k) => k.truncated)
+            .map(
+              (k) =>
+                `${k.text}: +${k.scrollW - k.clientW}px (+${(
+                  ((k.scrollW - k.clientW) / k.clientW) *
+                  100
+                ).toFixed(1)}%)`,
+            ),
+        ),
       );
     }
     // ── 4. Иконки StatCard на токенах (§2, вариант A)
