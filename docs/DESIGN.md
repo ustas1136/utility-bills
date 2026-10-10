@@ -14,28 +14,46 @@
 
 ---
 
-## Цвета (OKLCH)
+## Цвета
+
+Палитра — из Netvision 2.1 (`docs/Netvision_Design_Standard/tokens.json`); значения светлой, comfort и тёмной заданы в `frontend/src/index.css`. Тема переключается атрибутом `data-theme` на `<html>`.
 
 ### Базовая семантика
 
-| Токен | Светлая | Тёмная |
-|---|---|---|
-| `--background` | `oklch(0.985 0 0)` | `oklch(0.14 0.01 260)` |
-| `--foreground` | `oklch(0.145 0 0)` | `oklch(0.96 0 0)` |
-| `--card` | `oklch(1 0 0)` | `oklch(0.18 0.015 260)` |
-| `--muted` | `oklch(0.965 0.005 260)` | `oklch(0.24 0.015 260)` |
-| `--muted-foreground` | `oklch(0.55 0.02 260)` | `oklch(0.7 0.02 260)` |
-| `--border` | `oklch(0.92 0.005 260)` | `oklch(0.28 0.01 260)` |
+| Токен | light | comfort | dark |
+|---|---|---|---|
+| `--background` | `#f4f6f8` | `#e9e5da` | `#151c25` |
+| `--foreground` | `#202c3b` | `#333b37` | `#e4eaf2` |
+| `--card` / `--popover` | `#ffffff` | `#f5f1e7` | `#1e2834` |
+| `--muted` | `#edf1f5` | `#e6e1d5` | `#293646` |
+| `--muted-foreground` | `#536274` | `#5d655d` | `#afbccd` |
+| `--border` / `--input` | `#d8dfe7` | `#ccc9ba` | `#394959` |
+
+Маппинг Netvision → shadcn: `canvas → background`, `surface → card/popover`, `soft → muted`, `text → foreground`, `line → border/input`, `muted → muted-foreground`.
 
 ### Акценты
 
-| Токен | Светлая | Тёмная |
+| Токен | light / comfort | dark |
 |---|---|---|
 | `--primary` (emerald) | `oklch(0.55 0.17 160)` | `oklch(0.7 0.16 160)` |
+| `--primary-foreground` | `oklch(0.985 0 0)` | `oklch(0.145 0 0)` |
 | `--accent` | `oklch(0.96 0.02 160)` | `oklch(0.28 0.04 160)` |
-| `--destructive` (rose) | `oklch(0.58 0.22 20)` | `oklch(0.7 0.19 20)` |
-| `--success` | `oklch(0.62 0.17 150)` | `oklch(0.7 0.16 150)` |
-| `--warning` (amber) | `oklch(0.75 0.15 70)` | `oklch(0.78 0.15 70)` |
+| `--destructive` | `oklch(0.58 0.22 20)` | `oklch(0.7 0.19 20)` |
+| `--brand-panel` | `color-mix(in oklab, var(--primary) 80%, black)` | `var(--primary)` |
+
+Emerald-акцент намеренно взят не из Netvision (там синий) — это решение проекта. Comfort наследует тот же `--primary` из `:root`. `--brand-panel` — фон брендовой панели сплэша: в светлых темах темнее `--primary`, чтобы текст проходил §7 (6.63:1), в тёмной — сам `--primary` (7.99:1).
+
+### Статусы: парные токены
+
+Каждый статус — пара «фон + текст», применять только вместе (Netvision §2).
+
+| Смысл | Токены | light | comfort | dark |
+|---|---|---|---|---|
+| Норма | `--success` / `--success-bg` | `#246442` / `#e5f3ea` | `#345e3b` / `#e0eadb` | `#a0d7b3` / `#253c31` |
+| Предупреждение | `--warning` / `--warning-bg` | `#79500c` / `#fff0d5` | `#775017` / `#efe1c2` | `#edc880` / `#403728` |
+| Критическое | `--critical` / `--critical-bg` | `#a4323d` / `#fce9eb` | `#943c38` / `#eedbd6` | `#f4acb4` / `#442f39` |
+
+Статусы начислений (`StatusBadge`): `pending` → muted, `partial` → warning, `paid` → success, `overdue` → critical, `cancelled` → muted + line-through.
 
 ### Графики
 
@@ -45,13 +63,7 @@
 - `--chart-4` — Прочее
 - `--chart-5` — Резерв
 
-### Статусы
-
-- `pending` — slate
-- `partial` — amber
-- `paid` — emerald
-- `overdue` — rose
-- `cancelled` — muted + line-through
+Значения различаются по темам: light/comfort — `oklch(0.62 0.17 150)`, `(0.65 0.15 240)`, `(0.7 0.15 50)`, `(0.6 0.2 310)`, `(0.65 0.18 20)`; dark — `oklch(0.7 0.16 150)`, `(0.72 0.15 240)`, `(0.75 0.15 50)`, `(0.68 0.2 310)`, `(0.72 0.18 20)`. Графики берут цвета из `CATEGORY_COLORS` (`var(--chart-N)`), хардкода HSL нет.
 
 ---
 
@@ -81,17 +93,25 @@
 
 ---
 
-## Радиусы и тени
+## Радиусы, тени и размеры контролов
+
+Компонентные токены Netvision (§11):
 
 | Токен | Значение | Применение |
 |---|---|---|
-| `--radius` | 12 px | Базовый |
-| `--radius-sm` | 8 px | Маленькие |
-| `--radius-md` | 10 px | Badges, tooltip |
-| `--radius-lg` | 12 px | Кнопки, inputs |
-| `--radius-xl` | 16 px | Карточки, диалоги |
+| `--radius-control` | 12 px | Кнопки, input, select-триггер |
+| `--radius-popup` | 12 px | Панели: dropdown, select, popover, dialog, палитра |
+| `--radius-option` | 6 px | Пункт списка, статус-бейдж |
+| `--control-height` | 2.75rem (44 px) | Input, Select-триггер, Button `default` |
+| `--option-min-height` | 2.75rem (44 px) | Минимальная высота пункта панели |
+| `--popup-padding` | 6 px | Отступ панели |
+| `--popup-gap` | 8 px | Зазор внутри панели |
+| `--popup-max-height` | 320 px | Предел высоты панели (внутренняя прокрутка) |
+| `--popup-shadow` | `0 8px 24px rgb(0 0 0 / 0.12)` | Тень перекрывающего слоя |
 
-**Тени:** минимальные. Focus ring `ring-2 ring-ring ring-offset-2`, Dialog `shadow-lg`, карточки без теней.
+Шкала shadcn (`--radius` 12 px → `--radius-sm` 8, `--radius-md` 10, `--radius-lg` 12, `--radius-xl` 16) сохранена для легаси-примитивов `ui/*`; в новом коде использовать токены выше.
+
+**Тени:** только у перекрывающих слоёв (`--popup-shadow`), карточки без теней. Фокус у shadcn-примитивов — `ring-[3px] ring-ring/50`.
 
 ---
 
@@ -119,9 +139,15 @@
 ### Button
 
 Варианты: `default` / `outline` / `ghost` / `destructive` / `link`.
-Размеры: `sm` (h-9) / `default` (h-10) / `lg` (h-11) / `icon` (h-10 w-10).
+Размеры: `default` → `h-[var(--control-height)]` (44 px), `sm` (h-8), `xs` (h-6), `lg` (h-10), `icon` (size-9). Радиус у всех — `rounded-[var(--radius-control)]`.
 
 Иконка слева: `<Plus className="size-4 mr-2" />`.
+
+### Input / Select
+
+- `Input` → `h-[var(--control-height)]` (44 px), `rounded-[var(--radius-control)]`.
+- `SelectTrigger` → 44 px в размере `default`, `h-8` в `sm`, `rounded-[var(--radius-control)]`.
+- Кнопки в одной строке с полем — тоже 44 px: иначе разъезжаются нижние края (§4).
 
 ### Card
 
@@ -137,8 +163,19 @@ React Hook Form + Zod + shadcn Form.
 
 ### Dialog
 
-- `sm:max-w-md` — обычные
-- `sm:max-w-lg` — формы с двумя колонками
+- `sm:max-w-md` — обычные, `sm:max-w-lg` — формы с двумя колонками
+- Радиус `--radius-popup`, тень `--popup-shadow`; паддинг `p-6` и `gap-4` — свои, `max-height` не ограничивается (формы выше 320 px).
+
+### Раскрывающиеся панели (dropdown / select / popover / палитра)
+
+- Радиус `--radius-popup`, тень `--popup-shadow`, отступ панели `--popup-padding`.
+- Пункт: `rounded-[var(--radius-option)]`, не ниже `--option-min-height` (44 px).
+- `--popup-max-height` 320 px с внутренней прокруткой. У `select` предел живёт на вьюпорте: Radix ставит на контент inline `max-height`, который класс не перебьёт. Высоту вьюпорта **не** привязывать к высоте триггера — иначе видно один пункт.
+- Палитра Ctrl+K: те же токены плюс `[&_[cmdk-input]]:h-[var(--control-height)]` и `[&_[cmdk-group]]:px-[var(--popup-padding)]`.
+
+### StatusBadge
+
+`rounded-[var(--radius-option)]` (6 px) + парные токены статуса, `border-transparent`. Там, где сущность не из словаря начислений (статус приглашения, статус счётчика), применять прямые токены: словарь `StatusBadge` описывает только `pending/partial/paid/overdue/cancelled`.
 
 ### EmptyState
 
@@ -151,13 +188,13 @@ KPI `h-28` · Список `h-14` × 3–4 · График `h-72` · Табли�
 
 ---
 
-## Тёмная тема
+## Темы
 
-- Три режима: light / dark / system.
-- Zustand + persist в `localStorage`.
-- Класс `dark` на `<html>`.
-- Отдельная палитра OKLCH, не «инверсия».
-- Не чистый чёрный — `oklch(0.14 0.01 260)`.
+- Три темы: `light` / `comfort` / `dark`, плюс `system` (разрешается в light/dark по настройке ОС; comfort включается только явно).
+- Источник темы — атрибут `data-theme` на `<html>`. Класс `.dark` сохранён как алиас для обратной совместимости.
+- Zustand + persist в `localStorage` (`utility-bills-theme`); inline-скрипт в `index.html` ставит тему до первой отрисовки, чтобы не было вспышки.
+- `color-scheme: light` / `dark` — нативные чекбоксы, скроллбары и автозаполнение следуют теме (§11).
+- Палитры light/comfort — из Netvision, тёмная — отдельная палитра, не «инверсия». Не чистый чёрный: `#151c25`.
 - Графики адаптируются через `var(--chart-*)`.
 
 ---
@@ -217,6 +254,31 @@ Duration: 150–200 мс hover, 250 мс появление.
 - Кликабельные `<div>` (только `<button>` / `<Link>`)
 - `!important`
 - Хардкод цветов — только токены
+
+---
+
+## Соответствие Netvision 2.1
+
+| § | Тема | Статус |
+|---|---|---|
+| §2 | Три темы, нейтральные KPI | ✅ три темы, парные статус-токены, карточки KPI нейтральные |
+| §3 | Шрифты и размеры | ✅ system-ui без внешних, H1 32/28, KPI 32/28, tabular-nums |
+| §4 | Единые контролы | ✅ 44 px, radius-control 12 px, кнопки в строке с полем выровнены |
+| §5 | Сетка и радиусы | ✅ шаг 4 px, радиусы 12/6, без декоративных градиентов |
+| §7 | Доступность | ✅ контраст сплэша 6.63/7.99, фокус на примитивах |
+| §11 | Раскрывающиеся панели | ✅ popup-токены, пункты 44 px, max-height 320 px |
+
+## Сознательные исключения
+
+Зафиксированы комментариями в коде:
+
+- `components/QuickActions.tsx` — 4 различимых цвета для быстрых действий (визуальный код для узнаваемости).
+- `lib/property.ts` — 4 цвета для типов объектов: смысл категориальный, а не статусный (§1 запрещает цвет статуса без смысла).
+
+## Известные долги
+
+- `text-white` в `ui/button.tsx` и `ui/badge.tsx` (destructive-варианты) — белым по `--destructive`, который в тёмной теме светлый (`oklch(0.7 0.19 20)`); контраст под вопросом. Не входило в миграцию.
+- `?new=1` из палитры команд не работает: `ChargesPage` и `PropertiesPage` не читают `searchParams`, поэтому диалог создания не открывается.
 
 ---
 
