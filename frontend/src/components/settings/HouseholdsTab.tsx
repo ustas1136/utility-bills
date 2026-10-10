@@ -163,8 +163,8 @@ export function HouseholdsTab() {
                     key={inv.id}
                     className="flex items-center gap-3 py-3"
                   >
-                    <div className="size-9 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
-                      <Clock className="size-4 text-amber-600 dark:text-amber-400" />
+                    <div className="size-9 rounded-lg bg-[var(--warning-bg)] flex items-center justify-center shrink-0">
+                      <Clock className="size-4 text-[var(--warning)]" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="font-medium text-sm truncate">
@@ -177,7 +177,7 @@ export function HouseholdsTab() {
                     </div>
                     <Badge
                       variant="outline"
-                      className="text-xs font-normal bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-transparent"
+                      className="text-xs font-normal bg-[var(--warning-bg)] text-[var(--warning)] border-transparent"
                     >
                       Ожидает
                     </Badge>

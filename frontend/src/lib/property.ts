@@ -41,6 +41,9 @@ export const PROPERTY_ICONS: Record<PropertyType, LucideIcon> = {
   other: Package,
 };
 
+// Осознанное исключение: категории объектов с различимыми
+// цветами. §1 запрещает цвет статуса без смысла —
+// здесь смысл категориальный.
 export const PROPERTY_COLORS: Record<PropertyType, string> = {
   apartment:
     "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",

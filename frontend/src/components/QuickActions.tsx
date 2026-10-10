@@ -1,6 +1,8 @@
 import { Droplet, FileText, Plus, Receipt } from "lucide-react";
 import { Link } from "react-router-dom";
 
+// Осознанное исключение из §2: 4 различимых цвета
+// для быстрых действий. Визуальный код для узнаваемости.
 const ACTIONS = [
   {
     to: "/properties",

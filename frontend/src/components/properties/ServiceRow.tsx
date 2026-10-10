@@ -81,7 +81,7 @@ export function ServiceRow({ service }: Props) {
                       >
                         <span
                           className={`size-1.5 rounded-full shrink-0 ${
-                            m.replaced_at ? "bg-amber-500" : "bg-emerald-500"
+                            m.replaced_at ? "bg-[var(--warning)]" : "bg-[var(--success)]"
                           }`}
                         />
                         <span className="text-muted-foreground truncate">

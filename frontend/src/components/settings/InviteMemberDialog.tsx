@@ -203,7 +203,7 @@ export function InviteMemberDialog({ householdId }: Props) {
                     className="shrink-0"
                   >
                     {copied ? (
-                      <Check className="size-4 text-emerald-500" />
+                      <Check className="size-4 text-[var(--success)]" />
                     ) : (
                       <Copy className="size-4" />
                     )}

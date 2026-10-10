@@ -43,9 +43,9 @@ export function RegisterPage() {
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
-      <div className="hidden lg:flex flex-col justify-between p-12 bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 text-white">
+      <div className="hidden lg:flex flex-col justify-between p-12 bg-primary text-primary-foreground">
         <div className="flex items-center gap-2">
-          <div className="size-9 rounded-lg bg-white/15 backdrop-blur flex items-center justify-center">
+          <div className="size-9 rounded-lg bg-primary-foreground/15 backdrop-blur flex items-center justify-center">
             <Wallet className="size-5" />
           </div>
           <span className="font-semibold text-lg">Utility Bills</span>
@@ -55,18 +55,18 @@ export function RegisterPage() {
           <h1 className="text-4xl font-semibold leading-tight tracking-tight">
             Заведите порядок в платежах за 5 минут
           </h1>
-          <p className="text-white/80 leading-relaxed">
+          <p className="text-primary-foreground/80 leading-relaxed">
             Добавьте квартиру, дом, участок и автомобиль — и забудьте про
             бумажные квитанции. Приложение подскажет, что и когда оплатить.
           </p>
-          <ul className="space-y-2 text-sm text-white/90">
+          <ul className="space-y-2 text-sm text-primary-foreground/90">
             <li>✓ Бесплатно, без рекламы</li>
             <li>✓ Данные только у вас</li>
             <li>✓ Пригласите семью для совместного учёта</li>
           </ul>
         </div>
 
-        <div className="text-white/60 text-xs">
+        <div className="text-primary-foreground/60 text-xs">
           v0.1.0 · personal project
         </div>
       </div>

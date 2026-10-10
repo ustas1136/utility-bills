@@ -52,8 +52,8 @@ export function toCategoryTotals(items: ExpenseByMonthItem[]) {
 }
 
 export const CATEGORY_COLORS: Record<string, string> = {
-  utility: "hsl(160, 60%, 45%)",
-  tax: "hsl(240, 60%, 55%)",
-  insurance: "hsl(45, 85%, 55%)",
-  other: "hsl(310, 55%, 55%)",
+  utility: "var(--chart-1)",
+  tax: "var(--chart-2)",
+  insurance: "var(--chart-3)",
+  other: "var(--chart-4)",
 };

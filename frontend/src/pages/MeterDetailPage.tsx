@@ -109,14 +109,14 @@ export function MeterDetailPage() {
               {isReplaced ? (
                 <Badge
                   variant="outline"
-                  className="bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-transparent"
+                  className="bg-[var(--warning-bg)] text-[var(--warning)] border-transparent"
                 >
                   Заменён
                 </Badge>
               ) : (
                 <Badge
                   variant="outline"
-                  className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-transparent"
+                  className="bg-[var(--success-bg)] text-[var(--success)] border-transparent"
                 >
                   Активен
                 </Badge>

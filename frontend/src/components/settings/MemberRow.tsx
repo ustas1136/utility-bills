@@ -26,6 +26,7 @@ interface Props {
   memberEmail?: string;
 }
 
+// Роль — не статус. Цвет не несёт смысла, иконки достаточно.
 const ROLE_CONFIG: Record<
   HouseholdRole,
   { label: string; icon: typeof User; color: string }
@@ -33,17 +34,17 @@ const ROLE_CONFIG: Record<
   owner: {
     label: "Владелец",
     icon: Crown,
-    color: "text-amber-600 dark:text-amber-400",
+    color: "text-muted-foreground",
   },
   admin: {
     label: "Администратор",
     icon: Shield,
-    color: "text-blue-600 dark:text-blue-400",
+    color: "text-muted-foreground",
   },
   member: {
     label: "Участник",
     icon: User,
-    color: "text-emerald-600 dark:text-emerald-400",
+    color: "text-muted-foreground",
   },
   viewer: {
     label: "Наблюдатель",
