@@ -246,7 +246,7 @@ function ChannelRow({ channel, pref, onChange, saving }: ChannelRowProps) {
           </div>
           <Button
             variant="outline"
-            size="sm"
+            size="default"
             onClick={handleQuietHoursSave}
             disabled={saving}
           >
