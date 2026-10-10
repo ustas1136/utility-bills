@@ -31,6 +31,10 @@ const CHROME =
   process.env.HOME +
   "/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell";
 
+/** README-режим: `--readme` снимает 6 экранов 1440×900 в docs/screenshots. */
+const README = process.argv.includes("--readme");
+const README_OUT = path.resolve(DIR, "../../../docs/screenshots");
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const day = (offset) =>
   new Date(Date.now() + offset * 86400000).toISOString().slice(0, 10);
@@ -178,6 +182,108 @@ async function waitChrome(timeout = 25000) {
   throw new Error("CDP недоступен на " + CDP);
 }
 
+
+/** Идемпотентно приводит тестовое хозяйство к виду, пригодному для README. */
+async function seedDemo(token) {
+  const h = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+  const props = await (await fetch(API + "/properties", { headers: h })).json();
+  const hid = props[0].household_id;
+  const plan = {
+    apartment: { name: "Квартира на Ленина, 15", address: "ул. Ленина, 15, кв. 42" },
+    house: { name: "Дом в Сосновке", address: "Сосновка, ул. Лесная, 7" },
+    land: { name: "Участок ИЖС", address: "СНТ Берёзка, уч. 12" },
+    vehicle: { name: "Toyota Camry", address: null },
+  };
+  const byType = Object.fromEntries(props.map((p) => [p.type, p]));
+  for (const [type, meta] of Object.entries(plan)) {
+    let p = byType[type];
+    if (!p) {
+      p = await (
+        await fetch(API + "/properties", {
+          method: "POST",
+          headers: h,
+          body: JSON.stringify({ household_id: hid, type, ...meta }),
+        })
+      ).json();
+      console.log(`   + объект ${type}: ${p.name}`);
+    } else if (p.name !== meta.name) {
+      await fetch(`${API}/properties/${p.id}`, {
+        method: "PATCH",
+        headers: h,
+        body: JSON.stringify(meta),
+      });
+      console.log(`   ~ объект ${type} → ${meta.name}`);
+    }
+    byType[type] = p;
+  }
+  const svcPlan = {
+    apartment: [1, 2, 3, 4, 8],
+    house: [1, 5, 6, 8],
+    land: [7],
+    vehicle: [10],
+  };
+  for (const [type, types] of Object.entries(svcPlan)) {
+    const p = byType[type];
+    const cur = await (
+      await fetch(`${API}/properties/${p.id}/services`, { headers: h })
+    ).json();
+    const have = new Set((cur ?? []).map((x) => x.service_type_id));
+    for (const t of types) {
+      if (have.has(t)) continue;
+      const r = await fetch(`${API}/properties/${p.id}/services`, {
+        method: "POST",
+        headers: h,
+        body: JSON.stringify({ service_type_id: t }),
+      });
+      if (!r.ok) console.log(`   ! услуга ${t} для ${type}: HTTP ${r.status}`);
+    }
+  }
+  // правдоподобный серийный номер у активного счётчика
+  const svcs = await (
+    await fetch(`${API}/properties/${byType.apartment.id}/services`, { headers: h })
+  ).json();
+  for (const sv of svcs ?? []) {
+    const ms = await (
+      await fetch(`${API}/property-services/${sv.id}/meters`, { headers: h })
+    ).json();
+    const active = (ms ?? []).find((m) => !m.replaced_at);
+    if (active && active.serial_number?.startsWith("NV-")) {
+      await fetch(`${API}/meters/${active.id}`, {
+        method: "PATCH",
+        headers: h,
+        body: JSON.stringify({ serial_number: "50670598" }),
+      });
+      console.log("   ~ серийный номер счётчика → 50670598");
+    }
+    // показания, чтобы в README был не пустой график потребления
+    if (active) {
+      const rs = await (
+        await fetch(`${API}/meters/${active.id}/readings`, { headers: h })
+      ).json();
+      if (!(rs ?? []).length) {
+        const monthStart = (back) => {
+          const d = new Date();
+          d.setDate(1);
+          d.setMonth(d.getMonth() - back);
+          return d.toISOString().slice(0, 10);
+        };
+        for (const [back, value] of [[3, 1204.5], [2, 1338.2], [1, 1470.9], [0, 1622.4]]) {
+          const r = await fetch(`${API}/meters/${active.id}/readings`, {
+            method: "POST",
+            headers: h,
+            body: JSON.stringify({ value, taken_at: monthStart(back) }),
+          });
+          if (!r.ok) console.log(`   ! показание ${value}: HTTP ${r.status}`);
+        }
+        console.log("   + 4 показания счётчика");
+      }
+    }
+  }
+}
+
 async function main() {
   console.log("1. Данные через API");
   const { token, me } = await seed();
@@ -249,6 +355,83 @@ async function main() {
       `localStorage.setItem('utility-bills-auth', ${JSON.stringify(auth)});
        localStorage.setItem('utility-bills-theme', JSON.stringify({state:{theme:'light'},version:0})); 'ok'`,
     );
+
+    if (README) {
+      console.log("3. README-режим: демо-данные и съёмка 1440×900");
+      await seedDemo(token);
+      await cdp.send("Emulation.setDeviceMetricsOverride", {
+        width: 1440,
+        height: 900,
+        deviceScaleFactor: 2,
+        mobile: false,
+      });
+      fs.mkdirSync(README_OUT, { recursive: true });
+      const shotReadme = async (name) => {
+        const s = await cdp.send("Page.captureScreenshot", { format: "png" });
+        const file = path.join(README_OUT, name + ".png");
+        fs.writeFileSync(file, Buffer.from(s.data, "base64"));
+        console.log(
+          `   saved docs/screenshots/${name}.png`,
+          Math.round(fs.statSync(file).size / 1024) + "KB",
+        );
+      };
+      const goR = async (url, wait = 3400) => {
+        await cdp.send("Page.navigate", { url });
+        await sleep(wait);
+      };
+      const auth2 = { Authorization: `Bearer ${token}` };
+      const props = await (await fetch(API + "/properties", { headers: auth2 })).json();
+      const apartment = props.find((p) => p.type === "apartment") ?? props[0];
+      const svcList = await (
+        await fetch(`${API}/properties/${apartment.id}/services`, { headers: auth2 })
+      ).json();
+      let meterId = null;
+      for (const sv of svcList ?? []) {
+        const ms = await (
+          await fetch(`${API}/property-services/${sv.id}/meters`, { headers: auth2 })
+        ).json();
+        const active = (ms ?? []).find((m) => !m.replaced_at);
+        if (active) {
+          meterId = active.id;
+          break;
+        }
+      }
+      await js(`document.documentElement.setAttribute('data-theme','light'); 'ok'`);
+
+      await goR(APP + "/");
+      await shotReadme("dashboard");
+      await goR(APP + "/properties");
+      await shotReadme("properties");
+      await goR(APP + `/properties/${apartment.id}`);
+      await shotReadme("property-detail");
+      await goR(APP + "/charges");
+      await shotReadme("charges");
+      if (meterId) {
+        await goR(APP + `/meters/${meterId}`);
+        await shotReadme("meter");
+      } else {
+        console.warn("   !! активный счётчик не найден — meter.png пропущен");
+      }
+      await goR(APP + "/settings");
+      // SettingsPage не читает ?tab=, поэтому переключаем таб настоящим кликом
+      const tr = JSON.parse(
+        await js(`(()=>{const el=[...document.querySelectorAll('[role="tab"]')]
+          .find(e => e.textContent.trim() === 'Уведомления');
+          if(!el) return JSON.stringify(null);
+          const r = el.getBoundingClientRect();
+          return JSON.stringify({x:r.x+r.width/2, y:r.y+r.height/2});})()`),
+      );
+      if (tr) {
+        for (const type of ["mousePressed", "mouseReleased"])
+          await cdp.send("Input.dispatchMouseEvent", {
+            type, x: tr.x, y: tr.y, button: "left", buttons: 1, clickCount: 1,
+          });
+        await sleep(1500);
+      }
+      await shotReadme("settings");
+      cdp.ws.close();
+      return;
+    }
 
     console.log("3. Открываю /charges и жду бейджи");
     await cdp.send("Page.navigate", { url: APP + "/charges" });
