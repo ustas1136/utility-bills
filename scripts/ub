@@ -1,0 +1,318 @@
+#!/usr/bin/env bash
+# Utility Bills — dev control script
+# Использование: ub <command> [args]
+
+set -euo pipefail
+
+# Цвета для вывода
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+PROJECT_DIR="$HOME/projects/utility-bills"
+BACKEND_DIR="$PROJECT_DIR/backend"
+FRONTEND_DIR="$PROJECT_DIR/frontend"
+
+# Хелперы
+info()  { echo -e "${BLUE}ℹ${NC}  $*"; }
+ok()    { echo -e "${GREEN}✓${NC}  $*"; }
+warn()  { echo -e "${YELLOW}⚠${NC}  $*"; }
+err()   { echo -e "${RED}✗${NC}  $*" >&2; }
+header(){ echo -e "\n${BOLD}${CYAN}▸ $*${NC}\n"; }
+
+# Проверка Docker
+require_docker() {
+  if ! docker info > /dev/null 2>&1; then
+    err "Docker не запущен. Запустите Docker Desktop."
+    exit 1
+  fi
+}
+
+# Проверка, что мы в правильной папке
+require_project() {
+  if [[ ! -f "$PROJECT_DIR/docker-compose.yml" ]]; then
+    err "Не найден $PROJECT_DIR/docker-compose.yml"
+    err "Проверьте путь в переменной PROJECT_DIR внутри скрипта."
+    exit 1
+  fi
+}
+
+# ─── Команды ────────────────────────────────────────────────
+
+cmd_up() {
+  require_docker; require_project
+  header "Запуск всех сервисов"
+  cd "$PROJECT_DIR"
+  docker compose up -d "$@"
+  ok "Сервисы запущены"
+  cmd_health
+}
+
+cmd_down() {
+  require_project
+  header "Остановка сервисов"
+  cd "$PROJECT_DIR"
+  docker compose down "$@"
+  ok "Остановлено"
+}
+
+cmd_restart() {
+  require_project
+  if [[ $# -eq 0 ]]; then
+    header "Перезапуск всего"
+    cd "$PROJECT_DIR"
+    docker compose restart
+  else
+    header "Перезапуск: $*"
+    cd "$PROJECT_DIR"
+    docker compose restart "$@"
+  fi
+  ok "Готово"
+}
+
+cmd_status() {
+  require_docker; require_project
+  cd "$PROJECT_DIR"
+  docker compose ps
+}
+
+cmd_logs() {
+  require_project
+  cd "$PROJECT_DIR"
+  if [[ $# -eq 0 ]]; then
+    docker compose logs -f --tail=100
+  else
+    docker compose logs -f --tail=100 "$@"
+  fi
+}
+
+cmd_health() {
+  require_project
+  header "Health check"
+  local be db fe
+
+  # Backend
+  if curl -sf http://localhost:18090/api/v1/health > /dev/null 2>&1; then
+    ok "Backend:    http://localhost:18090  (alive)"
+  else
+    warn "Backend:    http://localhost:18090  (не отвечает)"
+  fi
+
+  # DB
+  if docker compose -f "$PROJECT_DIR/docker-compose.yml" exec -T db \
+       pg_isready -U user -d utility_bills > /dev/null 2>&1; then
+    ok "PostgreSQL: localhost:15440          (alive)"
+  else
+    warn "PostgreSQL: localhost:15440          (не отвечает)"
+  fi
+
+  # Frontend dev (порт 5173)
+  if curl -sf http://localhost:5173 > /dev/null 2>&1; then
+    ok "Frontend:   http://localhost:5173   (dev запущен)"
+  else
+    info "Frontend:   http://localhost:5173   (dev не запущен — это норм)"
+  fi
+
+  echo
+  info "Swagger:    http://localhost:18090/docs"
+  info "Проект:     $PROJECT_DIR"
+}
+
+cmd_shell() {
+  require_project
+  cd "$PROJECT_DIR"
+  local service="${1:-backend}"
+  header "Shell в контейнере $service"
+  docker compose exec "$service" bash || docker compose exec "$service" sh
+}
+
+cmd_psql() {
+  require_project
+  cd "$PROJECT_DIR"
+  header "psql"
+  docker compose exec db psql -U user -d utility_bills "$@"
+}
+
+cmd_migrate() {
+  require_project
+  cd "$PROJECT_DIR"
+  header "Применение миграций"
+  docker compose exec -T backend alembic upgrade head
+  ok "Миграции применены"
+}
+
+cmd_migration() {
+  require_project
+  if [[ $# -eq 0 ]]; then
+    err "Укажите описание: ub migration \"add table\""
+    exit 1
+  fi
+  cd "$PROJECT_DIR"
+  header "Создание миграции: $1"
+  docker compose exec -T backend alembic revision --autogenerate -m "$1"
+  info "Файл миграции создан в backend/app/db/migrations/versions/"
+  info "Проверьте его в VS Code и примените: ub migrate"
+}
+
+cmd_test() {
+  require_project
+  cd "$BACKEND_DIR"
+  header "Тесты backend"
+  if [[ ! -d ".venv" ]]; then
+    err ".venv не найден. Запустите: cd backend && python3.12 -m venv .venv && pip install -e '.[dev]'"
+    exit 1
+  fi
+  # shellcheck disable=SC1091
+  source .venv/bin/activate
+  TEST_DATABASE_URL="postgresql+psycopg://user:password@localhost:15440/utility_bills_test" \
+  DATABASE_URL="postgresql+psycopg://user:password@localhost:15440/utility_bills" \
+  JWT_SECRET="test-secret-key-must-be-at-least-32-bytes-long-for-hs256" \
+  pytest -v "$@"
+}
+
+cmd_lint() {
+  header "Линтеры"
+  # Backend
+  info "Backend: ruff"
+  (cd "$BACKEND_DIR" && source .venv/bin/activate && ruff check .)
+  ok "Backend lint OK"
+
+  # Frontend
+  info "Frontend: eslint"
+  (cd "$FRONTEND_DIR" && npm run lint --silent)
+  ok "Frontend lint OK"
+}
+
+cmd_build() {
+  header "Production build"
+  info "Frontend: vite build"
+  (cd "$FRONTEND_DIR" && npm run build)
+  ok "Frontend собран в frontend/dist/"
+}
+
+cmd_fe() {
+  cd "$FRONTEND_DIR"
+  info "Переход в $FRONTEND_DIR"
+  exec bash
+}
+
+cmd_be() {
+  cd "$BACKEND_DIR"
+  info "Переход в $BACKEND_DIR"
+  exec bash
+}
+
+cmd_fe_dev() {
+  cd "$FRONTEND_DIR"
+  header "Frontend dev-сервер (Vite)"
+  npm run dev
+}
+
+cmd_be_dev() {
+  cd "$BACKEND_DIR"
+  header "Backend dev (uvicorn, hot-reload)"
+  source .venv/bin/activate
+  uvicorn app.main:app --reload
+}
+
+cmd_clean() {
+  require_project
+  header "Очистка (down -v)"
+  warn "Будут удалены контейнеры И данные БД (volume)."
+  read -p "Продолжить? [y/N] " -r
+  echo
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    cd "$PROJECT_DIR"
+    docker compose down -v
+    ok "Очищено"
+  else
+    info "Отменено"
+  fi
+}
+
+cmd_help() {
+  cat <<EOF
+
+${BOLD}Utility Bills — dev script${NC}
+
+${CYAN}Использование:${NC}
+  ub <command> [args]
+
+${CYAN}Управление сервисами:${NC}
+  up [svc...]        Запустить Docker Compose (все или указанные)
+  down               Остановить
+  restart [svc...]   Перезапустить (все или указанные)
+  status             Статус контейнеров
+  logs [svc...]      Логи в реальном времени
+  shell [svc]        Bash внутри контейнера (по умолчанию backend)
+  clean              Полная очистка (down -v, удалит данные БД)
+
+${CYAN}Разработка:${NC}
+  fe                 Перейти в frontend/
+  be                 Перейти в backend/
+  fe-dev             Запустить Vite dev-сервер (порт 5173)
+  be-dev             Запустить uvicorn с --reload
+
+${CYAN}Проверки:${NC}
+  health             Health-check всех сервисов
+  test [args...]     Запустить pytest (передаются аргументы)
+  lint               ruff + eslint
+  build              Сборка frontend
+
+${CYAN}База данных:${NC}
+  migrate            Применить миграции (alembic upgrade head)
+  migration "..."    Создать новую миграцию
+  psql [args...]     Интерактивный psql в контейнере
+
+${CYAN}Прочее:${NC}
+  help               Эта справка
+
+${CYAN}Примеры:${NC}
+  ub up                       # запустить всё
+  ub logs backend             # смотреть логи backend
+  ub test -k auth             # прогнать тесты с фильтром auth
+  ub shell                    # зайти в backend-контейнер
+  ub psql -c "SELECT 1;"      # выполнить SQL
+
+EOF
+}
+
+# ─── Диспетчер ──────────────────────────────────────────────
+
+main() {
+  local cmd="${1:-help}"
+  shift || true
+
+  case "$cmd" in
+    up)         cmd_up "$@" ;;
+    down)       cmd_down "$@" ;;
+    restart)    cmd_restart "$@" ;;
+    status|ps)  cmd_status ;;
+    logs)       cmd_logs "$@" ;;
+    health)     cmd_health ;;
+    shell|sh)   cmd_shell "$@" ;;
+    psql)       cmd_psql "$@" ;;
+    migrate)    cmd_migrate ;;
+    migration|mig) cmd_migration "$@" ;;
+    test)       cmd_test "$@" ;;
+    lint)       cmd_lint ;;
+    build)      cmd_build ;;
+    fe)         cmd_fe ;;
+    be)         cmd_be ;;
+    fe-dev)     cmd_fe_dev ;;
+    be-dev)     cmd_be_dev ;;
+    clean)      cmd_clean ;;
+    help|-h|--help) cmd_help ;;
+    *)
+      err "Неизвестная команда: $cmd"
+      cmd_help
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"
