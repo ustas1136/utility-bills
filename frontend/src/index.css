@@ -242,3 +242,26 @@
     color: var(--foreground);
   }
 }
+
+/*
+ * Фон сплэш-экранов «Floating Numbers» (components/FloatingNumbers.tsx).
+ * Сознательное исключение из §1/§9 Netvision — причина и владелец в docs/DESIGN.md.
+ *
+ * Анимируются только transform и opacity: 28 абсолютно позиционированных
+ * элементов не должны вызывать layout/paint на каждом кадре. Длительность
+ * (40–60 s) и задержка (0–40 s) задаются на элементе инлайном — они случайны
+ * и вычисляются один раз за жизнь компонента.
+ *
+ * Свойство `animation-name` в шорткате элемента ссылается на эти кейфреймы.
+ * `prefers-reduced-motion` выше гасит их общим правилом `animation-duration`.
+ */
+@keyframes float-up {
+  from {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.03;
+  }
+  to {
+    transform: translate3d(0, -110vh, 0);
+    opacity: 0.06;
+  }
+}

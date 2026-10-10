@@ -5,6 +5,7 @@ import { z } from "zod";
 import { Wallet } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { FloatingNumbers } from "@/components/FloatingNumbers";
 import {
   Form,
   FormControl,
@@ -33,112 +34,122 @@ export function LoginPage() {
   const onSubmit = (values: FormValues) => login.mutate(values);
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2">
-      {/* Левая колонка — брендинг */}
-      <div className="hidden lg:flex flex-col justify-between p-12 bg-[var(--brand-panel)] text-primary-foreground">
-        <div className="flex items-center gap-2">
-          <div className="size-9 rounded-lg bg-primary-foreground/15 backdrop-blur flex items-center justify-center">
-            <Wallet className="size-5" />
-          </div>
-          <span className="font-semibold text-lg">Utility Bills</span>
-        </div>
+    /*
+     * Слой фона лежит рядом с гридом, а не внутри него: как первый элемент
+     * грида он сдвинул бы колонки на lg, а брендовая панель уехала бы вправо.
+     * Панель непрозрачная, поэтому слева цифры не видны — фон живёт только над
+     * пустой колонкой с формой.
+     */
+    <div className="relative min-h-screen">
+      <FloatingNumbers />
 
-        <div className="space-y-6 max-w-md">
-          <h1 className="text-4xl font-semibold leading-tight tracking-tight">
-            Все коммунальные платежи — в одном месте
-          </h1>
-          <p className="text-primary-foreground leading-relaxed">
-            Квартиры, дома, участки, автомобили, налоги и страховки. Учёт
-            показаний, автоматический расчёт, напоминания о сроках и понятные
-            отчёты.
-          </p>
-          <ul className="space-y-2 text-sm text-primary-foreground">
-            <li>✓ Единый дашборд по всем объектам</li>
-            <li>✓ Напоминания о предстоящих платежах</li>
-            <li>✓ Совместный доступ для семьи</li>
-          </ul>
-        </div>
-
-        <div className="text-primary-foreground text-xs">
-          v0.1.0 · personal project
-        </div>
-      </div>
-
-      {/* Правая колонка — форма */}
-      <div className="flex items-center justify-center p-6 lg:p-12">
-        <div className="w-full max-w-sm space-y-6">
-          <div className="lg:hidden flex items-center gap-2 justify-center">
-            <div className="size-9 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
+      <div className="min-h-screen grid lg:grid-cols-2">
+        {/* Левая колонка — брендинг */}
+        <div className="hidden lg:flex flex-col justify-between p-12 bg-[var(--brand-panel)] text-primary-foreground">
+          <div className="flex items-center gap-2">
+            <div className="size-9 rounded-lg bg-primary-foreground/15 backdrop-blur flex items-center justify-center">
               <Wallet className="size-5" />
             </div>
             <span className="font-semibold text-lg">Utility Bills</span>
           </div>
 
-          <div className="space-y-1 text-center lg:text-left">
-            <h2 className="text-[1.75rem] leading-9 font-semibold tracking-tight">Вход</h2>
-            <p className="text-sm text-muted-foreground">
-              Войдите, чтобы продолжить
+          <div className="space-y-6 max-w-md">
+            <h1 className="text-4xl font-semibold leading-tight tracking-tight">
+              Все коммунальные платежи — в одном месте
+            </h1>
+            <p className="text-primary-foreground leading-relaxed">
+              Квартиры, дома, участки, автомобили, налоги и страховки. Учёт
+              показаний, автоматический расчёт, напоминания о сроках и понятные
+              отчёты.
             </p>
+            <ul className="space-y-2 text-sm text-primary-foreground">
+              <li>✓ Единый дашборд по всем объектам</li>
+              <li>✓ Напоминания о предстоящих платежах</li>
+              <li>✓ Совместный доступ для семьи</li>
+            </ul>
           </div>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        autoComplete="email"
-                        placeholder="you@example.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <div className="text-primary-foreground text-xs">
+            v0.1.0 · personal project
+          </div>
+        </div>
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Пароль</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        autoComplete="current-password"
-                        placeholder="••••••••"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+        {/* Правая колонка — форма */}
+        <div className="flex items-center justify-center p-6 lg:p-12">
+          <div className="w-full max-w-sm space-y-6">
+            <div className="lg:hidden flex items-center gap-2 justify-center">
+              <div className="size-9 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
+                <Wallet className="size-5" />
+              </div>
+              <span className="font-semibold text-lg">Utility Bills</span>
+            </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={login.isPending}
+            <div className="space-y-1 text-center lg:text-left">
+              <h2 className="text-[1.75rem] leading-9 font-semibold tracking-tight">Вход</h2>
+              <p className="text-sm text-muted-foreground">
+                Войдите, чтобы продолжить
+              </p>
+            </div>
+
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          autoComplete="email"
+                          placeholder="you@example.com"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Пароль</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          autoComplete="current-password"
+                          placeholder="••••••••"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={login.isPending}
+                >
+                  {login.isPending ? "Входим…" : "Войти"}
+                </Button>
+              </form>
+            </Form>
+
+            <div className="text-sm text-center text-muted-foreground">
+              Нет аккаунта?{" "}
+              <Link
+                to="/register"
+                className="text-primary hover:underline font-medium"
               >
-                {login.isPending ? "Входим…" : "Войти"}
-              </Button>
-            </form>
-          </Form>
-
-          <div className="text-sm text-center text-muted-foreground">
-            Нет аккаунта?{" "}
-            <Link
-              to="/register"
-              className="text-primary hover:underline font-medium"
-            >
-              Зарегистрироваться
-            </Link>
+                Зарегистрироваться
+              </Link>
+            </div>
           </div>
         </div>
       </div>
