@@ -22,6 +22,9 @@
   --radius-control: 12px;
   --radius-popup: 12px;
   --radius-option: 6px;
+  /* §7: фокус — outline 2px с отступом 3px. */
+  --ring-width: 2px;
+  --ring-offset-width: 3px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -218,6 +221,16 @@
   html.dark,
   html[data-theme="dark"] {
     color-scheme: dark;
+  }
+
+  /* §7 / Netvision §9: уважать системную настройку «меньше движения». */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 
   * {
