@@ -119,12 +119,11 @@ const FAMILY = `(()=>{
   return JSON.stringify({ roles, badges });
 })()`;
 
-/** Панель сплэша: фон, текст и контраст (цвет конвертируем через canvas). */
+/** Панель сплэша: фон + контраст ВСЕХ текстовых элементов (цвет через пиксель canvas). */
 const SPLASH = `(()=>{
   const panel = [...document.querySelectorAll('div')]
     .find(e => (e.className||'').includes('lg:flex') && (e.className||'').includes('p-12'));
   if (!panel) return JSON.stringify(null);
-  const p = panel.querySelector('p');
   const parse = c => {
     const cv = document.createElement('canvas');
     cv.width = cv.height = 1;
@@ -139,14 +138,23 @@ const SPLASH = `(()=>{
     return 0.2126*f(c[0]) + 0.7152*f(c[1]) + 0.0722*f(c[2]);
   };
   const bg = parse(getComputedStyle(panel).backgroundColor);
-  const t = p ? parse(getComputedStyle(p).color) : null;
-  const eff = t ? [0,1,2].map(i => t[i]*t[3] + bg[i]*(1-t[3])) : null;
-  const ratio = eff ? (Math.max(lum(bg), lum(eff)) + 0.05) / (Math.min(lum(bg), lum(eff)) + 0.05) : null;
+  const ratio = t => {
+    const eff = [0,1,2].map(i => t[i]*t[3] + bg[i]*(1-t[3]));
+    return Math.round(((Math.max(lum(bg), lum(eff)) + 0.05) / (Math.min(lum(bg), lum(eff)) + 0.05))*100)/100;
+  };
+  const texts = [...panel.querySelectorAll('p, li, span, div')]
+    .filter(e => [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()))
+    .map(e => ({
+      tag: e.tagName.toLowerCase(),
+      text: (e.textContent||'').trim().slice(0, 22),
+      color: getComputedStyle(e).color,
+      contrast: ratio(parse(getComputedStyle(e).color))
+    }));
   return JSON.stringify({
     bgColor: getComputedStyle(panel).backgroundColor,
     bgImage: getComputedStyle(panel).backgroundImage,
-    textColor: p ? getComputedStyle(p).color : null,
-    contrast: ratio ? Math.round(ratio*100)/100 : null
+    texts,
+    minContrast: texts.length ? Math.min(...texts.map(t => t.contrast)) : null
   });
 })()`;
 
@@ -339,15 +347,21 @@ async function main() {
     console.log("A. Сплэш /login: solid primary и контраст текста");
     await go(APP + "/");
     await js(`localStorage.clear(); 'ok'`);
-    for (const th of ["light", "comfort"]) {
+    for (const th of ["light", "comfort", "dark"]) {
       await go(APP + "/login", 3500);
       await theme(th);
       const sp = JSON.parse(await js(SPLASH));
       if (!sp) { check(`${th}: панель найдена`, false, "нет панели"); continue; }
-      console.log(`   ${th}: bg=${sp.bgColor}, image=${sp.bgImage}, text=${sp.textColor}, contrast=${sp.contrast}`);
+      console.log(`   ${th}: bg=${sp.bgColor}, image=${sp.bgImage}`);
+      for (const t of sp.texts) console.log(`      ${t.tag} «${t.text}» ${t.color} -> ${t.contrast}`);
       check(`${th}: панель без градиента`, sp.bgImage === "none", sp.bgImage);
-      check(`${th}: фон = primary, не градиент`, sp.bgColor !== "rgba(0, 0, 0, 0)", sp.bgColor);
-      check(`${th}: контраст текста >= 4.5 (§7)`, sp.contrast >= 4.5, `${sp.contrast}`);
+      check(`${th}: фон панели задан`, sp.bgColor !== "rgba(0, 0, 0, 0)", sp.bgColor);
+      check(
+        `${th}: контраст всех текстов >= 4.5 (§7)`,
+        sp.minContrast !== null && sp.minContrast >= 4.5,
+        `минимум ${sp.minContrast}: ` +
+          JSON.stringify(sp.texts.filter((t) => t.contrast < 4.5).map((t) => `${t.tag} ${t.contrast}`)),
+      );
       await shot(`login-${th}`);
     }
 

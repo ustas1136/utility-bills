@@ -70,6 +70,10 @@
   --popup-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
   --option-min-height: 2.75rem;
 
+  /* Панель бренда на сплэше: в светлых темах темнее primary,
+     чтобы текст проходил §7 (4.5:1); в тёмной — сам primary. */
+  --brand-panel: color-mix(in oklab, var(--primary) 80%, black);
+
   --background: oklch(0.985 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -134,6 +138,7 @@
 }
 
 [data-theme="comfort"] {
+  --brand-panel: color-mix(in oklab, var(--primary) 80%, black);
   --background: #e9e5da;
   --foreground: #333b37;
   --card: #f5f1e7;
@@ -160,6 +165,9 @@
  */
 .dark,
 [data-theme="dark"] {
+  /* в тёмной теме primary светлый, поэтому панель — сам primary */
+  --brand-panel: var(--primary);
+
   /* поверхность, текст и статусы — палитра Netvision dark */
   --background: #151c25;
   --foreground: #e4eaf2;

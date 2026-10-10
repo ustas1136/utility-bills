@@ -175,6 +175,9 @@ export function HouseholdsTab() {
                         {formatRelative(inv.expires_at)}
                       </div>
                     </div>
+                    {/* Прямые токены, не StatusBadge: словарь StatusBadge описан
+                        для статусов начислений (pending/partial/paid/overdue/cancelled),
+                        а здесь — статус приглашения. Разные сущности. */}
                     <Badge
                       variant="outline"
                       className="text-xs font-normal bg-[var(--warning-bg)] text-[var(--warning)] border-transparent"

@@ -106,6 +106,9 @@ export function MeterDetailPage() {
               <h1 className="text-[1.75rem] leading-9 sm:text-[2rem] sm:leading-10 font-semibold tracking-tight">
                 Счётчик {m.serial_number ?? `#${m.id}`}
               </h1>
+              {/* Прямые токены, не StatusBadge: словарь StatusBadge описан
+                  для статусов начислений (pending/partial/paid/overdue/cancelled),
+                  а здесь — статус счётчика. Разные сущности. */}
               {isReplaced ? (
                 <Badge
                   variant="outline"
