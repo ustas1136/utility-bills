@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 import { CommandPalette } from "@/components/CommandPalette";
 import { Toaster } from "@/components/ui/sonner";
 import { useGlobalHotkey } from "@/hooks/use-global-hotkey";
-import { useThemeStore } from "@/hooks/use-theme";
+import { useThemeStore, nextTheme } from "@/hooks/use-theme";
 
 import { AppHeader } from "./AppHeader";
 import { AppSidebar } from "./AppSidebar";
@@ -21,15 +21,12 @@ export function AppLayout() {
     handler: useCallback(() => setPaletteOpen(true), []),
   });
 
-  // Ctrl+Shift+L / ⌘+Shift+L — переключить тему
+  // Ctrl+Shift+L / ⌘+Shift+L — переключить тему по кругу
   useGlobalHotkey({
     key: "l",
     meta: true,
     shift: true,
-    handler: useCallback(
-      () => setTheme(theme === "dark" ? "light" : "dark"),
-      [theme, setTheme],
-    ),
+    handler: useCallback(() => setTheme(nextTheme(theme)), [theme, setTheme]),
   });
 
   return (

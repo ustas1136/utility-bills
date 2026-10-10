@@ -4,11 +4,14 @@ import {
   Building2,
   LayoutDashboard,
   LogOut,
+  Monitor,
   Moon,
+  Palette,
   Plus,
   Receipt,
   Settings,
   Sun,
+  type LucideIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -24,9 +27,24 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
-import { useThemeStore } from "@/hooks/use-theme";
+import { nextTheme, useThemeStore, type Theme } from "@/hooks/use-theme";
 import { useAuthStore } from "@/store/auth";
 import { PROPERTY_ICONS, PROPERTY_LABELS } from "@/lib/property";
+
+/** Иконка текущей темы и название следующей — для пункта «Сменить тему». */
+const THEME_ICONS: Record<Theme, LucideIcon> = {
+  light: Sun,
+  comfort: Palette,
+  dark: Moon,
+  system: Monitor,
+};
+
+const THEME_NAMES: Record<Theme, string> = {
+  light: "светлую",
+  comfort: "комфортную",
+  dark: "тёмную",
+  system: "системную",
+};
 
 interface Props {
   open: boolean;
@@ -37,6 +55,8 @@ export function CommandPalette({ open, onOpenChange }: Props) {
   const navigate = useNavigate();
   const logout = useAuthStore((s) => s.logout);
   const { theme, setTheme } = useThemeStore();
+  const ThemeIcon = THEME_ICONS[theme];
+  const upcoming = nextTheme(theme);
   const [search, setSearch] = useState("");
 
   // Сбрасываем поиск при закрытии
@@ -109,22 +129,9 @@ export function CommandPalette({ open, onOpenChange }: Props) {
             <Plus className="mr-2 size-4" />
             <span>Новое начисление</span>
           </CommandItem>
-          <CommandItem
-            onSelect={() =>
-              run(() =>
-                setTheme(theme === "dark" ? "light" : "dark"),
-              )
-            }
-          >
-            {theme === "dark" ? (
-              <Sun className="mr-2 size-4" />
-            ) : (
-              <Moon className="mr-2 size-4" />
-            )}
-            <span>
-              Переключить тему на{" "}
-              {theme === "dark" ? "светлую" : "тёмную"}
-            </span>
+          <CommandItem onSelect={() => run(() => setTheme(upcoming))}>
+            <ThemeIcon className="mr-2 size-4" />
+            <span>Переключить на {THEME_NAMES[upcoming]}</span>
             <CommandShortcut>⌘⇧L</CommandShortcut>
           </CommandItem>
         </CommandGroup>

@@ -20,7 +20,15 @@ const TONES: Record<string, string> = {
 
 export function StatusBadge({ status }: { status: string }) {
   return (
-    <Badge variant="outline" className={cn("font-normal", TONES[status])}>
+    <Badge
+      variant="outline"
+      className={cn(
+        // §5: статус — 6px, не пилюля. cn() = twMerge, поэтому это
+        // перекрывает rounded-full из базовых классов Badge.
+        "rounded-[var(--radius-option)] font-normal",
+        TONES[status],
+      )}
+    >
       {LABELS[status] ?? status}
     </Badge>
   );

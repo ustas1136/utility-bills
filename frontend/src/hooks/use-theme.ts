@@ -1,14 +1,22 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+/** Порядок тем для циклического переключения (⌘⇧L, палитра команд). */
+export const THEMES = ["light", "comfort", "dark", "system"] as const;
+
 /** Выбор пользователя. `system` разрешается в light/dark по настройке ОС. */
-export type Theme = "light" | "comfort" | "dark" | "system";
+export type Theme = (typeof THEMES)[number];
 
 /** Тема, которая реально попадает в `data-theme`. */
 export type ResolvedTheme = Exclude<Theme, "system">;
 
-/** Порядок тем для переключателя. */
-export const THEMES: readonly ResolvedTheme[] = ["light", "comfort", "dark"];
+/**
+ * Возвращает следующую тему по кругу: light → comfort → dark → system → light.
+ * Если тема неожиданно вне списка, indexOf вернёт -1 и мы начнём с начала.
+ */
+export function nextTheme(theme: Theme): Theme {
+  return THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
+}
 
 /**
  * Ключ персиста. Продублирован строкой в inline-скрипте index.html —

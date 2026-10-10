@@ -43,5 +43,8 @@ Thumbs.db
 
 # Логи
 *.log
+logs/
+
+# Локальные справочные материалы Netvision — только для чтения, не для репозитория
 docs/Netvision_Design_Standard/
 docs/netvision-shots/
