@@ -67,6 +67,7 @@
   --popup-gap: 8px;
   --popup-max-height: 320px;
   --popup-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+  --option-min-height: 2.75rem;
 
   --background: oklch(0.985 0 0);
   --foreground: oklch(0.145 0 0);
