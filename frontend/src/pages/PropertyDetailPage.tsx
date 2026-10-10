@@ -69,7 +69,7 @@ export function PropertyDetailPage() {
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-semibold tracking-tight">{p.name}</h1>
+              <h1 className="text-[1.75rem] leading-9 sm:text-[2rem] sm:leading-10 font-semibold tracking-tight">{p.name}</h1>
               <PropertyTypeBadge type={p.type} />
             </div>
             {p.address && (

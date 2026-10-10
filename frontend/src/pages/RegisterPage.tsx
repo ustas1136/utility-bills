@@ -81,7 +81,7 @@ export function RegisterPage() {
           </div>
 
           <div className="space-y-1 text-center lg:text-left">
-            <h2 className="text-2xl font-semibold tracking-tight">
+            <h2 className="text-[1.75rem] leading-9 font-semibold tracking-tight">
               Регистрация
             </h2>
             <p className="text-sm text-muted-foreground">

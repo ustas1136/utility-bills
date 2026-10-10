@@ -32,7 +32,7 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Дашборд</h1>
+        <h1 className="text-[1.75rem] leading-9 sm:text-[2rem] sm:leading-10 font-semibold tracking-tight">Дашборд</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Обзор ближайших платежей и расходов
         </p>

@@ -71,7 +71,7 @@ export function ChargesPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Платежи</h1>
+          <h1 className="text-[1.75rem] leading-9 sm:text-[2rem] sm:leading-10 font-semibold tracking-tight">Платежи</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Начисления и оплаты
           </p>

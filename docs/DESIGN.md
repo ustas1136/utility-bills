@@ -57,13 +57,12 @@
 
 ## Типографика
 
-**Шрифт:** Inter Variable (`@fontsource-variable/inter`).
-
-Feature settings: `"cv11", "ss01"` — альтернативные глифы `1` и `a`.
+**Шрифт:** system-ui — стек `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`. Без внешних шрифтов (Netvision §3).
 
 | Элемент | Классы | Размер |
 |---|---|---|
-| H1 страницы | `text-2xl font-semibold tracking-tight` | 24 px |
+| H1 страницы | `text-[1.75rem] leading-9 sm:text-[2rem] sm:leading-10 font-semibold tracking-tight` | 32/40 px, узкое окно 28/36 px |
+| H1 сплэш-экрана (вход/регистрация) | `text-[1.75rem] leading-9 font-semibold tracking-tight` | 28/36 px |
 | H2 секции | `text-lg font-semibold` | 18 px |
 | H3 карточки | `text-base font-semibold` | 16 px |
 | Body | `text-sm` | 14 px |
@@ -73,6 +72,12 @@ Feature settings: `"cv11", "ss01"` — альтернативные глифы `
 - `tabular-nums` — обязательно для чисел.
 - `tracking-tight` — для H1.
 - `uppercase tracking-wide text-xs text-muted-foreground` — для ярлыков.
+
+### Соответствие Netvision 2.1 §3
+
+- Шрифт: `system-ui`, без внешних — **соответствует**.
+- H1: 32/40 px (28/36 на узком окне) — **соответствует**.
+- H2: 18/27 px — **соответствует**.
 
 ---
 
@@ -217,7 +222,7 @@ Duration: 150–200 мс hover, 250 мс появление.
 
 ## Стек
 
-Tailwind v4 · shadcn/ui · Radix UI · lucide-react · Recharts · Inter Variable · sonner · cmdk
+Tailwind v4 · shadcn/ui · Radix UI · lucide-react · Recharts · system-ui · sonner · cmdk
 
 ---
 
