@@ -14,10 +14,13 @@
   /*
    * Netvision 2.1 (§11): радиус контрола и радиус панели попапа —
    * одно значение. Пункт списка — отдельный, 6px.
+   *
+   * Здесь литералы, а не var(--radius-*): та же переменная объявлена
+   * в :root ниже, и ссылка на себя давала бы циклическое значение.
    */
-  --radius-control: var(--radius-control);
-  --radius-popup: var(--radius-popup);
-  --radius-option: var(--radius-option);
+  --radius-control: 12px;
+  --radius-popup: 12px;
+  --radius-option: 6px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -193,6 +196,20 @@
 }
 
 @layer base {
+  /*
+   * Netvision 2.1 (§11): нативные чекбоксы, скроллбары и автозаполнение
+   * форм должны следовать теме, а не оформлению ОС. `html.dark` — тот же
+   * алиас обратной совместимости, что и в блоке токенов выше.
+   */
+  html[data-theme="light"],
+  html[data-theme="comfort"] {
+    color-scheme: light;
+  }
+  html.dark,
+  html[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
   * {
     border-color: var(--border);
   }
