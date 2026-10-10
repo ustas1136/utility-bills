@@ -33,10 +33,22 @@ import { PROPERTY_LABELS, PROPERTY_TYPES } from "@/lib/property";
 
 interface Props {
   householdId: number;
+  /** Управляемое открытие: нужно для deep-link `?new=1`. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function PropertyFormDialog({ householdId }: Props) {
-  const [open, setOpen] = useState(false);
+export function PropertyFormDialog({
+  householdId,
+  open: openProp,
+  onOpenChange,
+}: Props) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = openProp ?? internalOpen;
+  const setOpen = (v: boolean) => {
+    setInternalOpen(v);
+    onOpenChange?.(v);
+  };
   const [type, setType] = useState<PropertyType>("apartment");
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");

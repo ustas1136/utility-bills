@@ -28,8 +28,22 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-export function CreateChargeDialog() {
-  const [open, setOpen] = useState(false);
+interface Props {
+  /** Управляемое открытие: нужно для deep-link `?new=1`. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function CreateChargeDialog({
+  open: openProp,
+  onOpenChange,
+}: Props = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = openProp ?? internalOpen;
+  const setOpen = (v: boolean) => {
+    setInternalOpen(v);
+    onOpenChange?.(v);
+  };
   const [mode, setMode] = useState<"manual" | "calculated">("manual");
 
   const properties = useQuery({

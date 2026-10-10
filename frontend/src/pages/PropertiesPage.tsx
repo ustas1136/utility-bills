@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Building2 } from "lucide-react";
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import { householdsApi } from "@/api/households";
 import {
@@ -27,6 +28,15 @@ const FILTERS: { value: Filter; label: string }[] = [
 
 export function PropertiesPage() {
   const [filter, setFilter] = useState<Filter>("all");
+  const [params, setParams] = useSearchParams();
+  const [createOpen, setCreateOpen] = useState(false);
+  // Deep-link из палитры команд: /properties?new=1 открывает форму объекта.
+  // Состояние выводим из параметра (без эффекта), URL чистим при закрытии.
+  const wantsNew = params.get("new") === "1";
+  const handleCreateOpenChange = (v: boolean) => {
+    setCreateOpen(v);
+    if (!v && wantsNew) setParams({}, { replace: true });
+  };
 
   const households = useQuery({
     queryKey: ["households"],
@@ -53,7 +63,11 @@ export function PropertiesPage() {
           </p>
         </div>
         {personalHousehold && (
-          <PropertyFormDialog householdId={personalHousehold.id} />
+          <PropertyFormDialog
+            householdId={personalHousehold.id}
+            open={createOpen || wantsNew}
+            onOpenChange={handleCreateOpenChange}
+          />
         )}
       </div>
 

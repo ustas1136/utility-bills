@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Receipt } from "lucide-react";
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import { chargesApi, type ChargeStatus } from "@/api/charges";
 import { propertiesApi } from "@/api/properties";
@@ -26,6 +27,15 @@ const FILTERS: { value: Filter; label: string }[] = [
 
 export function ChargesPage() {
   const [filter, setFilter] = useState<Filter>("all");
+  const [params, setParams] = useSearchParams();
+  const [createOpen, setCreateOpen] = useState(false);
+  // Deep-link из палитры команд: /charges?new=1 открывает диалог создания.
+  // Состояние выводим из параметра (без эффекта), URL чистим при закрытии.
+  const wantsNew = params.get("new") === "1";
+  const handleCreateOpenChange = (v: boolean) => {
+    setCreateOpen(v);
+    if (!v && wantsNew) setParams({}, { replace: true });
+  };
 
   const charges = useQuery({
     queryKey: ["charges", filter],
@@ -76,7 +86,10 @@ export function ChargesPage() {
             Начисления и оплаты
           </p>
         </div>
-        <CreateChargeDialog />
+        <CreateChargeDialog
+          open={createOpen || wantsNew}
+          onOpenChange={handleCreateOpenChange}
+        />
       </div>
 
       <div className="flex flex-wrap gap-2">
